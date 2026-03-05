@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    font-size: 12px;
+    color: #1e293b;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: #0f172a;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-icon {
+    width: 28px; height: 28px;
+    background: #1d4ed8;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .header-title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .header-sub {
+    color: #64748b;
+    font-size: 10px;
+    margin-top: 1px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .counter-pill {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .counter-pill span { color: #60a5fa; font-weight: 700; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    background: #0f172a;
+    padding: 0 16px;
+    display: flex;
+    gap: 2px;
+    border-top: 1px solid #1e293b;
+    flex-shrink: 0;
+  }
+  .tab {
+    padding: 7px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .tab:hover { color: #94a3b8; }
+  .tab.active-sanas   { color: #34d399; border-bottom-color: #34d399; }
+  .tab.active-criticas { color: #f87171; border-bottom-color: #f87171; }
+  .tab.active-top     { color: #fb923c; border-bottom-color: #fb923c; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-green { background: #dcfce7; color: #15803d; }
+  .btn-green:hover { background: #15803d; color: #fff; }
+  .btn-red   { background: #fee2e2; color: #b91c1c; }
+  .btn-red:hover { background: #b91c1c; color: #fff; }
+  .btn-orange { background: #ffedd5; color: #c2410c; }
+  .btn-orange:hover { background: #c2410c; color: #fff; }
+  .btn-ghost {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #94a3b8;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { background: #f1f5f9; color: #475569; }
+
+  /* ── TABLE WRAP ── */
+  .table-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: #1e293b;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  thead th {
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td {
+    padding: 5px 8px;
+    vertical-align: middle;
+  }
+
+  /* Col widths */
+  .col-num    { width: 32px; }
+  .col-prio   { width: 94px; }
+  .col-accion { min-width: 0; }
+  .col-resp   { width: 120px; }
+  .col-fecha  { width: 105px; }
+  .col-status { width: 110px; }
+  .col-del    { width: 28px; }
+
+  /* ── INPUTS ── */
+  td input[type="text"],
+  td input[type="date"] {
+    width: 100%;
+    border: 1.5px solid transparent;
+    border-radius: 5px;
+    padding: 4px 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #1e293b;
+    background: transparent;
+    outline: none;
+    transition: all 0.12s;
+  }
+  td input:hover { border-color: #e2e8f0; background: #fff; }
+  td input:focus { border-color: #93c5fd; background: #fff; box-shadow: 0 0 0 2px rgba(147,197,253,0.25); }
+
+  /* ── SELECT: prioridad ── */
+  .sel-prio {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1.5px solid transparent;
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    font-weight: 600;
+    transition: border-color 0.12s;
+    appearance: none;
+    text-align: center;
+  }
+  .sel-prio:focus { border-color: #93c5fd; }
+  .sel-prio[data-v="Alta"]  { color: #dc2626; background: #fee2e2; border-color: #fca5a5; }
+  .sel-prio[data-v="Media"] { color: #d97706; background: #fef3c7; border-color: #fcd34d; }
+  .sel-prio[data-v="Baja"]  { color: #16a34a; background: #dcfce7; border-color: #86efac; }
+  .sel-prio[data-v=""]      { color: #94a3b8; }
+
+  /* ── SELECT: status ── */
+  .sel-status {
+    width: 100%;
+    padding: 4px 7px;
+    border-radius: 20px;
+    border: 1.5px solid transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    text-align: center;
+    transition: all 0.12s;
+  }
+  .sel-status[data-v="pending"]  { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+  .sel-status[data-v="progress"] { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  .sel-status[data-v="done"]     { background: #dcfce7; color: #15803d; border-color: #86efac; }
+  .sel-status[data-v="blocked"]  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+  /* ── NUM cell ── */
+  .num-cell {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #cbd5e1;
+  }
+
+  /* ── DEL BTN ── */
+  .btn-del {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.1s;
+    display: block;
+    margin: 0 auto;
+  }
+  .btn-del:hover { color: #ef4444; background: #fee2e2; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    padding: 36px 0;
+    text-align: center;
+    color: #94a3b8;
+  }
+  .empty-state .es-icon { font-size: 28px; margin-bottom: 8px; }
+  .empty-state .es-text { font-size: 12px; }
+
+  /* ── LEFT ACCENT ── */
+  tr.alta   td:first-child { border-left: 3px solid #ef4444; }
+  tr.media  td:first-child { border-left: 3px solid #f59e0b; }
+  tr.baja   td:first-child { border-left: 3px solid #22c55e; }
+
+  /* ── PROGRESS BAR (footer) ── */
+  .footer-bar {
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .prog-label { font-size: 10px; color: #64748b; white-space: nowrap; }
+  .prog-track { flex: 1; height: 4px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #60a5fa, #1d4ed8); transition: width 0.4s; }
+  .prog-pct   { font-size: 10px; font-weight: 700; color: #1d4ed8; min-width: 30px; text-align: right; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 14px; right: 14px;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    transform: translateY(40px);
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── scrollbar ── */
+  .table-wrap::-webkit-scrollbar { width: 5px; }
+  .table-wrap::-webkit-scrollbar-track { background: transparent; }
+  .table-wrap::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">⚡</div>
+    <div>
+      <div class="header-title">Plan de Acción — Rotación de Personal</div>
+      <div class="header-sub">TO SUPPLY · Performance TO</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="counter-pill">Acciones: <span id="totalCount">0</span></div>
+    <div class="counter-pill">Completadas: <span id="doneCount" style="color:#34d399">0</span></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab" id="tab-sanas"    onclick="switchTab('sanas')">🟢 Áreas Sanas</div>
+  <div class="tab" id="tab-criticas" onclick="switchTab('criticas')">🔴 Áreas Críticas</div>
+  <div class="tab" id="tab-top"      onclick="switchTab('top')">⚠️ Top Offender</div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button id="addBtn" class="btn-add btn-green" onclick="addRow()">＋ Nueva acción</button>
+  <button class="btn-ghost" onclick="exportCSV()">↓ Exportar CSV</button>
+</div>
+
+<!-- TABLE PANELS -->
+<div class="table-wrap">
+
+  <!-- SANAS -->
+  <div class="tab-panel" id="panel-sanas">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th class="col-prio">Prioridad</th>
+          <th class="col-accion">Acción / Iniciativa</th>
+          <th class="col-resp">Responsable</th>
+          <th class="col-fecha">F. Inicio</th>
+          <th class="col-fecha">F. Compromiso</th>
+          <th class="col-status">Estatus</th>
+          <th class="col-del"></th>
+        </tr>
+      </thead>
+      <tbody id="body-sanas">
+        <tr class="empty-row"><td colspan="8"><div class="empty-state"><div class="es-icon">🟢</div><div class="es-text">Sin acciones · Haz clic en "+ Nueva acción"</div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CRITICAS -->
+  <div class="tab-panel" id="panel-criticas">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th class="col-prio">Prioridad</th>
+          <th class="col-accion">Acción / Iniciativa</th>
+          <th class="col-resp">Responsable</th>
+          <th class="col-fecha">F. Inicio</th>
+          <th class="col-fecha">F. Compromiso</th>
+          <th class="col-status">Estatus</th>
+          <th class="col-del"></th>
+        </tr>
+      </thead>
+      <tbody id="body-criticas">
+        <tr class="empty-row"><td colspan="8"><div class="empty-state"><div class="es-icon">🔴</div><div class="es-text">Sin acciones · Haz clic en "+ Nueva acción"</div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOP OFFENDER -->
+  <div class="tab-panel" id="panel-top">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th style="width:160px;">Puesto / Área</th>
+          <th style="width:90px;">Rotación %</th>
+          <th style="width:70px;"># Bajas</th>
+          <th style="width:80px;">HC Actual</th>
+          <th class="col-accion">Plan de Acción</th>
+          <th class="col-status">Estatus</th>
+          <th class="col-del"></th>
+        </tr>
+      </thead>
+      <tbody id="body-top">
+        <tr class="empty-row"><td colspan="8"><div class="empty-state"><div class="es-icon">⚠️</div><div class="es-text">Sin puestos · Haz clic en "+ Nueva acción"</div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FOOTER BAR -->
+<div class="footer-bar">
+  <div class="prog-label" id="progLabel">0 / 0 completadas</div>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-pct" id="progPct">—</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const TABS = ['sanas', 'criticas', 'top'];
+let currentTab = 'sanas';
+const counts = { sanas: 0, criticas: 0, top: 0 };
+
+// ── SWITCH TAB ──────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  TABS.forEach(t => {
+    document.getElementById('panel-' + t).classList.remove('active');
+    const el = document.getElementById('tab-' + t);
+    el.className = 'tab';
+  });
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).className = 'tab active-' + tab;
+
+  // Update add button color
+  const btn = document.getElementById('addBtn');
+  btn.className = 'btn-add ' + (tab === 'sanas' ? 'btn-green' : tab === 'criticas' ? 'btn-red' : 'btn-orange');
+  btn.textContent = tab === 'top' ? '＋ Nuevo puesto' : '＋ Nueva acción';
+}
+
+// ── ADD ROW ──────────────────────────────
+function addRow() {
+  const tab = currentTab;
+  counts[tab]++;
+  const n = counts[tab];
+  const tbody = document.getElementById('body-' + tab);
+
+  // Remove empty state
+  const empty = tbody.querySelector('.empty-row');
+  if (empty) empty.remove();
+
+  const tr = document.createElement('tr');
+
+  if (tab === 'top') {
+    tr.innerHTML = `
+      <td class="num-cell col-num">${n}</td>
+      <td><input type="text" placeholder="Puesto / Área…"></td>
+      <td><input type="text" placeholder="0.0%"></td>
+      <td><input type="text" placeholder="0"></td>
+      <td><input type="text" placeholder="0"></td>
+      <td><input type="text" placeholder="Describe el plan…"></td>
+      <td><select class="sel-status" data-v="pending" onchange="onStatusChange(this)">
+        <option value="pending">⚪ Pendiente</option>
+        <option value="progress">🔵 En Proceso</option>
+        <option value="done">✅ Completado</option>
+        <option value="blocked">🚫 Bloqueado</option>
+      </select></td>
+      <td><button class="btn-del" onclick="delRow(this)">✕</button></td>
+    `;
+  } else {
+    tr.innerHTML = `
+      <td class="num-cell col-num">${n}</td>
+      <td class="col-prio">
+        <select class="sel-prio" data-v="" onchange="onPrioChange(this)">
+          <option value="">— Prio</option>
+          <option value="Alta">🔴 Alta</option>
+          <option value="Media">🟡 Media</option>
+          <option value="Baja">🟢 Baja</option>
+        </select>
+      </td>
+      <td class="col-accion"><input type="text" placeholder="Describe la acción a implementar…"></td>
+      <td class="col-resp"><input type="text" placeholder="Responsable"></td>
+      <td class="col-fecha"><input type="date"></td>
+      <td class="col-fecha"><input type="date"></td>
+      <td class="col-status">
+        <select class="sel-status" data-v="pending" onchange="onStatusChange(this)">
+          <option value="pending">⚪ Pendiente</option>
+          <option value="progress">🔵 En Proceso</option>
+          <option value="done">✅ Completado</option>
+          <option value="blocked">🚫 Bloqueado</option>
+        </select>
+      </td>
+      <td class="col-del"><button class="btn-del" onclick="delRow(this)">✕</button></td>
+    `;
+  }
+
+  tbody.appendChild(tr);
+  updateStats();
+
+  // Focus first input
+  const inp = tr.querySelector('input[type="text"]');
+  if (inp) setTimeout(() => inp.focus(), 50);
+}
+
+// ── PRIORIDAD CHANGE ──────────────────────
+function onPrioChange(sel) {
+  const v = sel.value;
+  sel.setAttribute('data-v', v);
+  const tr = sel.closest('tr');
+  tr.className = v === 'Alta' ? 'alta' : v === 'Media' ? 'media' : v === 'Baja' ? 'baja' : '';
+}
+
+// ── STATUS CHANGE ─────────────────────────
+function onStatusChange(sel) {
+  sel.setAttribute('data-v', sel.value);
+  updateStats();
+}
+
+// ── DELETE ROW ────────────────────────────
+function delRow(btn) {
+  const tr = btn.closest('tr');
+  const tab = currentTab;
+  tr.style.transition = 'opacity 0.2s';
+  tr.style.opacity = '0';
+  setTimeout(() => {
+    tr.remove();
+    // Check empty
+    const tbody = document.getElementById('body-' + tab);
+    if (tbody.rows.length === 0) {
+      const icon = tab === 'sanas' ? '🟢' : tab === 'criticas' ? '🔴' : '⚠️';
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><div class="empty-state"><div class="es-icon">${icon}</div><div class="es-text">Sin acciones · Haz clic en "+ Nueva acción"</div></div></td></tr>`;
+    }
+    // Renumber
+    renumber(tbody);
+    updateStats();
+  }, 200);
+}
+
+// ── RENUMBER ──────────────────────────────
+function renumber(tbody) {
+  let i = 1;
+  tbody.querySelectorAll('tr:not(.empty-row) .num-cell').forEach(c => {
+    c.textContent = i++;
+  });
+}
+
+// ── UPDATE STATS ──────────────────────────
+function updateStats() {
+  let total = 0, done = 0;
+  ['sanas', 'criticas', 'top'].forEach(t => {
+    const sels = document.querySelectorAll('#body-' + t + ' .sel-status');
+    sels.forEach(s => {
+      total++;
+      if (s.value === 'done') done++;
+    });
+  });
+
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('doneCount').textContent  = done;
+
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progLabel').textContent = `${done} / ${total} completadas`;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = total > 0 ? pct + '%' : '—';
+}
+
+// ── EXPORT CSV ────────────────────────────
+function exportCSV() {
+  const rows = [['Tab', 'Prioridad', 'Acción', 'Responsable', 'F.Inicio', 'F.Compromiso', 'Estatus']];
+  ['sanas', 'criticas', 'top'].forEach(t => {
+    document.querySelectorAll('#body-' + t + ' tr:not(.empty-row)').forEach(tr => {
+      const inp = tr.querySelectorAll('input, select');
+      if (t === 'top') {
+        rows.push([t,
+          '',
+          inp[0]?.value || '',
+          inp[1]?.value || '',
+          inp[2]?.value || '',
+          inp[3]?.value || '',
+          inp[4]?.value || ''
+        ]);
+      } else {
+        rows.push([t,
+          tr.querySelector('.sel-prio')?.value || '',
+          inp[0]?.value || '',
+          inp[1]?.value || '',
+          inp[2]?.value || '',
+          inp[3]?.value || '',
+          tr.querySelector('.sel-status')?.value || ''
+        ]);
+      }
+    });
+  });
+
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'PlanAccion_TO_SUPPLY.csv';
+  a.click();
+  showToast('CSV exportado ✓');
+}
+
+// ── TOAST ─────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── INIT ──────────────────────────────────
+switchTab('sanas');
+</script>
+</body>
+</html>
